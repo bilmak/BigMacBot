@@ -1,0 +1,23 @@
+Перше повідомлення: “Welcome to McDonald’s! What can I get you started with?”
+
+Після успішного додавання: “What else can I get you?”
+
+Комбо без напою: “Which drink would you like for your combo? Fries is the default side.”
+
+Неповне або невалідне: “I couldn’t match that to our menu. Could you please specify …?”
+
+Завершення: показати тотал і список позицій (з розмірами/додатками).
+
+
+
+
+elif user_input == "add":
+            order.add_item(user_input)
+        elif user_input == "remove":
+            delete_item = input(
+                f"\nIf you want to delete an item, write its name below.\n")
+            order.delete_item(delete_item)
+        elif user_input == "update":
+            update_order = input(
+                f"\nIf you want to update order, write its name below.\n")
+            order.update_order(update_order)

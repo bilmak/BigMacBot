@@ -1,4 +1,4 @@
-from chat_bot import chat_with_gpt
+from llm import chat_with_gpt
 
 if __name__ == "__main__":
     while True:
