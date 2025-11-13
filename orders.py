@@ -2,19 +2,35 @@ import yaml
 
 
 class Order:
-    user_order: list = []
 
     def __init__(self):
-        self.menu_data = self.load_menu("menu_deals.yaml")
+        self.menu_data = self.load_menu("menu_virtual_items.yaml")
+        self.user_order: list = []
 
-    def add_item(self, item_name):
+    def add_item(self, item_name: str):
         self.user_order.append(item_name)
 
-    def update_order(self):
-        pass
+    def update_order(self, old_name, new_name):
+        if old_name in self.user_order:
+            index = self.user_order.index(old_name)
+            self.user_order[index] = new_name
+            print(f"You updated {old_name} on {new_name}\n")
+        else:
+            print(f"Item '{old_name}' not found in your order")
+
+    def parse_update_command(self, text: str):
+        rest_after_update = text[:7].strip().lower()
+        if "on" in rest_after_update:
+            i = rest_after_update.index(" on ")
+            return rest_after_update[:i].strip(), rest_after_update[i+4:].strip()
+        else:
+            return None, None
 
     def delete_item(self, item_name):
+        if item_name not in self.user_order:
+            print(f"Item '{item_name}' not found in your order")
         self.user_order.remove(item_name)
+        print(f"You removed {item_name}\n")
 
     def load_menu(self, file_path):
         with open(file_path, 'r') as deals_file:
