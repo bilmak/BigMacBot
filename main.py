@@ -6,7 +6,10 @@ if __name__ == "__main__":
     order = orders.Order()
 
     user_input = input("what do you want to order?\n")
-    order.add_item(user_input)
+    if not order.is_item_in_menu(user_input):
+        print(f"We dont have {user_input} in menu\n")
+    else:
+        order.add_item(user_input)
 
     while user_input.lower() != "no":
         print(
@@ -37,8 +40,11 @@ if __name__ == "__main__":
             order.update_order(old_name, new_name)
 
         else:
-            order.add_item(user_input)
-            print(f"You added {user_input}")
+            if not order.is_item_in_menu(user_input):
+                print(f"We dont have {user_input} in menu\n")
+            else:
+                order.add_item(user_input)
+                print(f"You added {user_input}")
 
     print(f"Total: {order.calculate_total()}")
     print(f"Items: {', '.join(order.user_order)}")

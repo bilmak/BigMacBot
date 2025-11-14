@@ -36,4 +36,20 @@ class Order:
                 if order_name == item["name"]:
                     total += item["price"]
 
+            for item in self.menu_data["items"]:
+                if order_name == item["name"]:
+                    total += item["price"]
+
         return total
+
+    def menu_names(self):
+        names = []
+        for combo in self.menu_data["combos"]:
+            names.append(combo["name"])
+
+        for item in self.menu_data["items"]:
+            names.append(item["name"])
+        return names
+
+    def is_item_in_menu(self, item: str) -> bool:
+        return item.lower() in (name.lower() for name in self.menu_names())
