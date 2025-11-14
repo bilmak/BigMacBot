@@ -18,14 +18,6 @@ class Order:
         else:
             print(f"Item '{old_name}' not found in your order")
 
-    def parse_update_command(self, text: str):
-        rest_after_update = text[:7].strip().lower()
-        if "on" in rest_after_update:
-            i = rest_after_update.index(" on ")
-            return rest_after_update[:i].strip(), rest_after_update[i+4:].strip()
-        else:
-            return None, None
-
     def delete_item(self, item_name):
         if item_name not in self.user_order:
             print(f"Item '{item_name}' not found in your order")
