@@ -57,6 +57,7 @@ if __name__ == "__main__":
         else:
             order.add_item(user_input)
             handle_meal_fries(order, user_input)
+            handle_meal_drinks(order, user_input)
 
         while user_input.lower() != "no":
             print(
