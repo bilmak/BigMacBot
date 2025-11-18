@@ -66,6 +66,7 @@ class Order:
 
     def calculate_total(self):
         total = 0.0
+
         combos = self.menu_data.get("combos", [])
         items = self.menu_data.get("items", [])
 
@@ -74,37 +75,66 @@ class Order:
             key = combo["name"]
             combos_name[key] = combo
 
-        free_fries = set()
-        free_drinks = set()
+        meals_count = 0
+        for name in self.user_order:
+            if name in combos_name:
+                meals_count += 1
 
-        for order_name in self.user_order:
-            combo = combos_name.get(order_name)
-            if not combo:
-                continue
+        fries_count = {}
+        drinks_count = {}
 
-            slots = combo.get("slots", {})
-            fries_choices = set(slots.get("fries", []))
-            drinks_choices = set(slots.get("drinks", []))
-
-            for item_name in self.user_order:
-                if item_name in fries_choices:
-                    free_fries.add(item_name)
-                if item_name in drinks_choices:
-                    free_drinks.add(item_name)
-
-        for order_name in self.user_order:
-            if order_name in combos_name:
-                total += combos_name[order_name]["price"]
-                continue
-
+        for name in self.user_order:
             for item in items:
-                if order_name == item["name"]:
-                    if item.get("category") == "fries" and order_name in free_fries:
-                        break
-                    if item.get("category") == "drinks" and order_name in free_drinks:
-                        break
+                if item["name"] == name:
+                    category = item.get("category")
 
-                    total += item["price"]
+                    if category == "fries":
+                        if name not in fries_count:
+                            fries_count[name] = 1
+                        else:
+                            fries_count[name] += 1
+
+                    if category == "drinks":
+                        if name not in drinks_count:
+                            drinks_count[name] = 1
+                        else:
+                            drinks_count[name] += 1
+
+        for name in self.user_order:
+            if name in combos_name:
+                price = float(combos_name[name]["price"])
+                total += price
+                continue
+
+            price = None
+            category = None
+            for item in items:
+                if item["name"] == name:
+                    price = float(item["price"])
+                    category = item.get("category")
                     break
+
+            if price is None:
+                continue
+
+            if category == "fries":
+                if meals_count > 0 and fries_count.get(name, 0) > 0:
+                    fries_count[name] -= 1
+                    meals_count -= 1
+                    continue
+                else:
+                    total += price
+                    continue
+
+            if category == "drinks":
+                if meals_count > 0 and drinks_count.get(name, 0) > 0:
+                    drinks_count[name] -= 1
+                    meals_count -= 1
+                    continue
+                else:
+                    total += price
+                    continue
+
+            total += price
 
         return total

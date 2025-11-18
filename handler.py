@@ -1,7 +1,6 @@
 import orders
 
 
-
 def handle_meal_fries(order, meal_name: str) -> None:
     if "Meal" not in meal_name or not order.is_item_in_menu(meal_name):
         return
