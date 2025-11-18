@@ -1,49 +1,6 @@
 from llm import chat_with_gpt
 import orders
-
-
-def handle_meal_fries(order, meal_name: str) -> None:
-    if "Meal" not in meal_name or not order.is_item_in_menu(meal_name):
-        return
-
-    fries_options = order.get_combo_slot_fries(meal_name)
-
-    input_type_of_fries = input(
-        f"What kind of fries do you want?\nOptions: {', '.join(fries_options)}\n"
-    ).strip()
-
-    if not input_type_of_fries:
-        print("Ok, I will skip fries choice.\n")
-        return
-
-    if input_type_of_fries in fries_options:
-        order.add_item(input_type_of_fries)
-        print(f"You ordered {meal_name} with {input_type_of_fries}")
-    else:
-        print(
-            f"We don't have {input_type_of_fries}. I will skip fries choice.\n")
-
-
-def handle_meal_drinks(order, meal_name):
-
-    if "Meal" not in meal_name or not order.is_item_in_menu(meal_name):
-        return
-    drinks_options = order.get_combo_slot_drinks(meal_name)
-    input_type_of_drinks = input(
-        f"What kind of drinks do you want?\nOptions: {', '.join(drinks_options)}\n"
-    ).strip()
-
-    if not input_type_of_drinks:
-        print("Ok, I will skip drinks choice.\n")
-        return
-
-    if input_type_of_drinks in drinks_options:
-        order.add_item(input_type_of_drinks)
-        print(f"You ordered {meal_name} with {input_type_of_drinks}")
-    else:
-        print(
-            f"We don't have {input_type_of_drinks}. I will skip drinks choice.\n")
-
+import handler
 
 if __name__ == "__main__":
     order = orders.Order()
@@ -56,8 +13,8 @@ if __name__ == "__main__":
             print(f"We don't have {user_input} in menu\n")
         else:
             order.add_item(user_input)
-            handle_meal_fries(order, user_input)
-            handle_meal_drinks(order, user_input)
+            handler.handle_meal_fries(order, user_input)
+            handler.handle_meal_drinks(order, user_input)
 
         while user_input.lower() != "no":
             print(
@@ -98,8 +55,8 @@ if __name__ == "__main__":
                 else:
                     order.add_item(user_input)
                     print(f"You added {user_input}")
-                    handle_meal_fries(order, user_input)
-                    handle_meal_drinks(order, user_input)
+                    handler.handle_meal_fries(order, user_input)
+                    handler.handle_meal_drinks(order, user_input)
 
         print(f"Total: {order.calculate_total():.2f}")
         print(f"Items: {', '.join(order.user_order)}")

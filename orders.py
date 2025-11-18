@@ -42,7 +42,7 @@ class Order:
     def is_item_in_menu(self, item: str) -> bool:
         return item.lower() in (name.lower() for name in self.menu_names())
 
-    def get_combo_slot_fries(self, name_meal) -> list:
+    def get_combo_slot_fries(self, name_meal: str) -> list:
         meal_name = name_meal.strip().lower()
 
         for combo in self.menu_data.get("combos", []):
@@ -53,7 +53,7 @@ class Order:
 
         return []
 
-    def get_combo_slot_drinks(self, name_meal) -> list:
+    def get_combo_slot_drinks(self, name_meal: str) -> list:
         meal_name = name_meal.strip().lower()
 
         for combo in self.menu_data.get("combos", []):
