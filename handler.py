@@ -12,8 +12,8 @@ def handle_meal_fries(order, meal_name: str) -> None:
     ).strip()
 
     if not input_type_of_fries:
-        print("Ok, I will skip fries choice\n")
-        return
+        print("Ok, I add French Fries\n")
+        order.add_item(["French Fries"])
 
     if input_type_of_fries in fries_options:
         order.add_item(input_type_of_fries)
@@ -33,7 +33,7 @@ def handle_meal_drinks(order, meal_name):
     ).strip()
 
     if not input_type_of_drinks:
-        print("Ok, I will skip drinks choice.\n")
+        print("Ok, I add .\n")
         return
 
     if input_type_of_drinks in drinks_options:

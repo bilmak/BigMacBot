@@ -5,25 +5,41 @@ class Order:
 
     def __init__(self):
         self.menu_data = self.load_menu("menu_virtual_items.yaml")
-        self.user_order: list = []
+        self.menu_ingredients = self.load_menu("menu_ingredients.yaml")
+        self.user_order: list[dict] = []
 
-    def add_item(self, item_name: str):
-        self.user_order.append(item_name)
+    def add_raw_item(self, item_name: str):
+        self.user_order.append({"name": item_name})
+
+    def add_meal(self, meal_name: str, drink: str, fries: str):
+        self.user_order.append({
+            "name": meal_name,
+            "drink": drink,
+            "fries": fries,
+        })
+
+    def add_burger_ingredients(self, name, additionals, number):
+        self.user_order.append({
+            "name": name,
+            "additionals": additionals,
+            "number": number,
+        })
 
     def update_order(self, old_name, new_name):
-        if old_name in self.user_order:
-            index = self.user_order.index(old_name)
-            self.user_order[index] = new_name
-            print(f"You updated {old_name} on {new_name}\n")
-        else:
-            print(f"Item '{old_name}' not found in your order")
+        for item in self.user_order:
+            if item.get("name") == old_name:
+                item["name"] = new_name
+                print(f"You updated {old_name} to {new_name}\n")
+                return
+        print(f"Item '{old_name}' not found in your order")
 
     def delete_item(self, item_name):
-        if item_name not in self.user_order:
-            print(f"Item '{item_name}' not found in your order")
-            return
-        self.user_order.remove(item_name)
-        print(f"You removed {item_name}\n")
+        for i, item in enumerate(self.user_order):
+            if item["name"] == item_name:
+                self.user_order.pop(i)
+                print(f"You removed {item_name}\n")
+                return
+        print(f"Item '{item_name}' not found in your order")
 
     def load_menu(self, file_path):
         with open(file_path, 'r') as deals_file:
@@ -69,72 +85,47 @@ class Order:
 
         combos = self.menu_data.get("combos", [])
         items = self.menu_data.get("items", [])
+        ingredients = self.menu_ingredients.get("ingredients", [])
 
-        combos_name = {}
+        new_structures_combos_by_name = {}
         for combo in combos:
             key = combo["name"]
-            combos_name[key] = combo
+            new_structures_combos_by_name[key] = combo
 
-        meals_count = 0
-        for name in self.user_order:
-            if name in combos_name:
-                meals_count += 1
+        new_structures_items_by_name = {}
+        for item in items:
+            key = item["name"]
+            new_structures_items_by_name[key] = item
 
-        fries_count = {}
-        drinks_count = {}
+        new_structures_ingredients_by_name = {}
+        for ing in ingredients:
+            key = ing["name"]
+            new_structures_ingredients_by_name[key] = ing
 
-        for name in self.user_order:
-            for item in items:
-                if item["name"] == name:
-                    category = item.get("category")
+        for order_item in self.user_order:
+            name = order_item.get("name")
+            quantity = order_item.get("quantity", 1)
 
-                    if category == "fries":
-                        if name not in fries_count:
-                            fries_count[name] = 1
-                        else:
-                            fries_count[name] += 1
-
-                    if category == "drinks":
-                        if name not in drinks_count:
-                            drinks_count[name] = 1
-                        else:
-                            drinks_count[name] += 1
-
-        for name in self.user_order:
-            if name in combos_name:
-                price = float(combos_name[name]["price"])
-                total += price
+            if name in new_structures_combos_by_name:
+                combo = new_structures_combos_by_name[name]
+                price = float(combo["price"])
+                total += price * quantity
                 continue
+            if name in new_structures_items_by_name:
+                item = new_structures_items_by_name[name]
+                price = float(item["price"])
+                total += price * quantity
+            if "additionals" in order_item:
+                additionals = order_item["additionals"]
+                if isinstance(additionals, dict):
+                    additionals = [additionals]
+                for add in additionals:
+                    add_name = add.get("name")
+                    add_number = add.get("number", 1)
+                    ing = new_structures_ingredients_by_name.get(add_name)
+                    if ing is None:
+                        continue
 
-            price = None
-            category = None
-            for item in items:
-                if item["name"] == name:
-                    price = float(item["price"])
-                    category = item.get("category")
-                    break
-
-            if price is None:
-                continue
-
-            if category == "fries":
-                if meals_count > 0 and fries_count.get(name, 0) > 0:
-                    fries_count[name] -= 1
-                    meals_count -= 1
-                    continue
-                else:
-                    total += price
-                    continue
-
-            if category == "drinks":
-                if meals_count > 0 and drinks_count.get(name, 0) > 0:
-                    drinks_count[name] -= 1
-                    meals_count -= 1
-                    continue
-                else:
-                    total += price
-                    continue
-
-            total += price
-
+                    ing_price = float(ing["price"])
+                    total += ing_price * add_number * quantity
         return total

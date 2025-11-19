@@ -57,6 +57,6 @@ if __name__ == "__main__":
                     print(f"You added {user_input}")
                     handler.handle_meal_fries(order, user_input)
                     handler.handle_meal_drinks(order, user_input)
-
+  
         print(f"Total: {order.calculate_total():.2f}")
         print(f"Items: {', '.join(order.user_order)}")
