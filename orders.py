@@ -8,8 +8,11 @@ class Order:
         self.menu_ingredients = self.load_menu("menu_ingredients.yaml")
         self.user_order: list[dict] = []
 
-    def add_raw_item(self, item_name: str):
-        self.user_order.append({"name": item_name})
+    def add_raw_item(self, item_name: str, size: str):
+        item = {"name": item_name}
+        if size:
+            item["size"] = size
+        self.user_order.append(item)
 
     def add_meal(self, meal_name: str, fries: str, drink: str):
         self.user_order.append({
@@ -77,6 +80,19 @@ class Order:
             if combo_name == meal_name:
                 slot = combo.get("slots", {})
                 return slot.get("drinks", [])
+
+        return []
+
+    def get_item_sizes(self, item_name: str) -> list:
+        name_lower = item_name.strip().lower()
+
+        for item in self.menu_data.get("items", []):
+            item_name_in_menu = item.get("name", "").strip().lower()
+            if item_name_in_menu == name_lower:
+                for proper in item.get("properties", []):
+                    if proper.get("name") == "size":
+                        return proper.get("values", [])
+                break
 
         return []
 
