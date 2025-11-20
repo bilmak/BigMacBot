@@ -1,18 +1,15 @@
 from llm import chat_with_gpt
 import orders
 import handler
+import json
 
 
 def print_order(order):
     if not order.user_order:
-        print("Your order: Empty\n")
+        print("Your order: []\n")
         return
 
-    names = []
-    for item in order.user_order:
-        names.append(item["name"])
-
-    print("Your order:", ", ".join(names), "\n")
+    print("Your order:", json.dumps(order.user_order), "\n")
 
 
 if __name__ == "__main__":
@@ -82,5 +79,4 @@ if __name__ == "__main__":
 
         print(f"Total: {order.calculate_total():.2f}")
 
-        names = [item["name"] for item in order.user_order]
-        print("Items:", ", ".join(names))
+        print("Items:", json.dumps(order.user_order))

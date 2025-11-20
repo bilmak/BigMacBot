@@ -21,7 +21,7 @@ def handle_meal_fries(order, meal_name: str) -> str:
     return "French Fries"
 
 
-def handle_meal_drinks(order, meal_name: str)->str:
+def handle_meal_drinks(order, meal_name: str) -> str:
     if "meal" not in meal_name.lower() or not order.is_item_in_menu(meal_name):
         return ""
 
@@ -36,5 +36,5 @@ def handle_meal_drinks(order, meal_name: str)->str:
             return input_type_of_drinks
 
         print(
-            f"We don't have {input_type_of_drinks}. Try again\n"
+            f"There is no default drink product, so be sure to choose it yourself.\n"
         )
