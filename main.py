@@ -2,6 +2,19 @@ from llm import chat_with_gpt
 import orders
 import handler
 
+
+def print_order(order):
+    if not order.user_order:
+        print("Your order: Empty\n")
+        return
+
+    names = []
+    for item in order.user_order:
+        names.append(item["name"])
+
+    print("Your order:", ", ".join(names), "\n")
+
+
 if __name__ == "__main__":
     order = orders.Order()
 
@@ -12,14 +25,18 @@ if __name__ == "__main__":
         if not order.is_item_in_menu(user_input):
             print(f"We don't have {user_input} in menu\n")
         else:
-            order.add_item(user_input)
-            handler.handle_meal_fries(order, user_input)
-            handler.handle_meal_drinks(order, user_input)
+            if "meal" in user_input.lower():
+                order.add_meal(
+                    user_input,
+                    handler.handle_meal_fries(order, user_input),
+                    handler.handle_meal_drinks(order, user_input),
+                )
+            else:
+                order.add_raw_item(user_input)
+                print(f"You added {user_input}")
 
         while user_input.lower() != "no":
-            print(
-                f"\nYour order: {', '.join(order.user_order) if order.user_order else 'Empty'}.\n"
-            )
+            print_order(order)
 
             print(
                 "\nIf you want to add something else, write it below."
@@ -34,11 +51,11 @@ if __name__ == "__main__":
 
             if user_input.lower() == "no":
                 break
-
+            # delete
             elif user_input.lower().startswith("delete "):
                 item_name = user_input[7:].strip()
                 order.delete_item(item_name)
-
+            # update
             elif user_input.lower().startswith("update "):
                 rest = user_input[7:]
                 parts = rest.split(" on ")
@@ -53,10 +70,17 @@ if __name__ == "__main__":
                 if not order.is_item_in_menu(user_input):
                     print(f"We don't have {user_input} in menu\n")
                 else:
-                    order.add_item(user_input)
-                    print(f"You added {user_input}")
-                    handler.handle_meal_fries(order, user_input)
-                    handler.handle_meal_drinks(order, user_input)
-  
+                    if "meal" in user_input.lower():
+                        order.add_meal(
+                            user_input,
+                            handler.handle_meal_fries(order, user_input),
+                            handler.handle_meal_drinks(order, user_input),
+                        )
+                    else:
+                        order.add_raw_item(user_input)
+                        print(f"You added {user_input}")
+
         print(f"Total: {order.calculate_total():.2f}")
-        print(f"Items: {', '.join(order.user_order)}")
+
+        names = [item["name"] for item in order.user_order]
+        print("Items:", ", ".join(names))

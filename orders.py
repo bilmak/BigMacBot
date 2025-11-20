@@ -11,18 +11,18 @@ class Order:
     def add_raw_item(self, item_name: str):
         self.user_order.append({"name": item_name})
 
-    def add_meal(self, meal_name: str, drink: str, fries: str):
+    def add_meal(self, meal_name: str, fries: str, drink: str):
         self.user_order.append({
             "name": meal_name,
-            "drink": drink,
             "fries": fries,
+            "drink": drink,
         })
 
-    def add_burger_ingredients(self, name, additionals, number):
+    def add_burger_ingredients(self, name, additionals, quantity):
         self.user_order.append({
             "name": name,
             "additionals": additionals,
-            "number": number,
+            "quantity": quantity,
         })
 
     def update_order(self, old_name, new_name):
