@@ -1,5 +1,5 @@
 
-def handle_meal_fries(order, meal_name: str) -> str:
+def handler_meal_fries(order, meal_name: str) -> str:
     if "meal" not in meal_name.lower() or not order.is_item_in_menu(meal_name):
         return ""
 
@@ -21,7 +21,7 @@ def handle_meal_fries(order, meal_name: str) -> str:
     return "French Fries"
 
 
-def handle_meal_drinks(order, meal_name: str) -> str:
+def handler_meal_drinks(order, meal_name: str) -> str:
     if "meal" not in meal_name.lower() or not order.is_item_in_menu(meal_name):
         return ""
 
@@ -38,3 +38,31 @@ def handle_meal_drinks(order, meal_name: str) -> str:
         print(
             f"There is no default drink product, so be sure to choose it yourself.\n"
         )
+
+
+def handler_item_size(order, item_name: str) -> str:
+    if "meal" in item_name.lower():
+        return ""
+
+    size_options = order.get_item_sizes(item_name)
+    # for milk
+    if not size_options:
+        return ""
+
+    while True:
+        input_size = input(
+            f"What size of {item_name} do you want?\nOptions: {', '.join(size_options)}\n"
+        ).strip().lower()
+        if not input_size:
+            if "medium" in size_options:
+                print(f"Ok, I set {item_name} size to medium\n")
+                return "medium"
+            else:
+                print(f"Ok, I set {item_name} size to {size_options[0]}\n")
+                return size_options[0]
+
+        if input_size in size_options:
+            print(f"Ok, {item_name} {input_size}\n")
+            return input_size
+
+        print("Wrong size, choose from the list\n")

@@ -25,12 +25,17 @@ if __name__ == "__main__":
             if "meal" in user_input.lower():
                 order.add_meal(
                     user_input,
-                    handler.handle_meal_fries(order, user_input),
-                    handler.handle_meal_drinks(order, user_input),
+                    handler.handler_meal_fries(order, user_input),
+                    handler.handler_meal_drinks(order, user_input),
                 )
             else:
-                order.add_raw_item(user_input)
-                print(f"You added {user_input}")
+                size = handler.handler_item_size(order, user_input)
+                order.add_raw_item(user_input, size)
+                if size:
+                    print(f"You added {size} {user_input}")
+                else:
+
+                    print(f"You added {user_input}")
 
         while user_input.lower() != "no":
             print_order(order)
@@ -70,12 +75,16 @@ if __name__ == "__main__":
                     if "meal" in user_input.lower():
                         order.add_meal(
                             user_input,
-                            handler.handle_meal_fries(order, user_input),
-                            handler.handle_meal_drinks(order, user_input),
+                            handler.handler_meal_fries(order, user_input),
+                            handler.handler_meal_drinks(order, user_input),
                         )
                     else:
-                        order.add_raw_item(user_input)
-                        print(f"You added {user_input}")
+                        size = handler.handler_item_size(order, user_input)
+                        order.add_raw_item(user_input, size)
+                        if size:
+                            print(f"You added {size} {user_input}")
+                        else:
+                            print(f"You added {user_input}")
 
         print(f"Total: {order.calculate_total():.2f}")
 
