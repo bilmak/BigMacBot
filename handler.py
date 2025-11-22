@@ -45,7 +45,7 @@ def handler_item_size(order, item_name: str) -> str:
         return ""
 
     size_options = order.get_item_sizes(item_name)
-    # for milk
+    # only for milk
     if not size_options:
         return ""
 
@@ -66,3 +66,6 @@ def handler_item_size(order, item_name: str) -> str:
             return input_size
 
         print("Wrong size, choose from the list\n")
+
+
+# def handler_burger(order, name, additionals=None, removed=None):

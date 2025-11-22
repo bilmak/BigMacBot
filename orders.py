@@ -4,7 +4,7 @@ import yaml
 class Order:
 
     def __init__(self):
-        self.menu_data = self.load_menu("menu_virtual_items.yaml")
+        #self.menu_data = self.load_menu("menu_virtual_items.yaml")
         self.menu_ingredients = self.load_menu("menu_ingredients.yaml")
         self.user_order: list[dict] = []
 
@@ -51,10 +51,10 @@ class Order:
 
     def menu_names(self):
         names = []
-        for combo in self.menu_data["combos"]:
+        for combo in self.menu_ingredients["combos"]:
             names.append(combo["name"])
 
-        for item in self.menu_data["items"]:
+        for item in self.menu_ingredients["items"]:
             names.append(item["name"])
         return names
 
@@ -64,7 +64,7 @@ class Order:
     def get_combo_slot_fries(self, name_meal: str) -> list:
         meal_name = name_meal.strip().lower()
 
-        for combo in self.menu_data.get("combos", []):
+        for combo in self.menu_ingredients.get("combos", []):
             combo_name = combo.get("name", "").strip().lower()
             if combo_name == meal_name:
                 slot = combo.get("slots", {})
@@ -75,7 +75,7 @@ class Order:
     def get_combo_slot_drinks(self, name_meal: str) -> list:
         meal_name = name_meal.strip().lower()
 
-        for combo in self.menu_data.get("combos", []):
+        for combo in self.menu_ingredients.get("combos", []):
             combo_name = combo.get("name", "").strip().lower()
             if combo_name == meal_name:
                 slot = combo.get("slots", {})
@@ -86,7 +86,7 @@ class Order:
     def get_item_sizes(self, item_name: str) -> list:
         name_lower = item_name.strip().lower()
 
-        for item in self.menu_data.get("items", []):
+        for item in self.menu_ingredients.get("items", []):
             item_name_in_menu = item.get("name", "").strip().lower()
             if item_name_in_menu == name_lower:
                 for proper in item.get("properties", []):
@@ -99,8 +99,8 @@ class Order:
     def calculate_total(self):
         total = 0.0
 
-        combos = self.menu_data.get("combos", [])
-        items = self.menu_data.get("items", [])
+        combos = self.menu_ingredients.get("combos", [])
+        items = self.menu_ingredients.get("items", [])
         ingredients = self.menu_ingredients.get("ingredients", [])
 
         new_structures_combos_by_name = {}
