@@ -29,13 +29,29 @@ if __name__ == "__main__":
                     handler.handler_meal_drinks(order, user_input),
                 )
             else:
-                size = handler.handler_item_size(order, user_input)
-                order.add_raw_item(user_input, size)
-                if size:
-                    print(f"You added {size} {user_input}")
-                else:
+                if order.is_burger(user_input):
+                    answer = input(
+                        "Do you want to customize this burger? (yes/no)\n").strip().lower()
+                    if answer == "yes":
+                        burger_data = handler.handler_burger(order, user_input)
+                        order.user_order.append(burger_data)
+                        print("You castomized your burger")
+                    else:
+                        size = handler.handler_item_size(order, user_input)
+                        order.add_raw_item(user_input, size)
+                        if size:
+                            print(f"You added {size} {user_input}")
+                        else:
 
-                    print(f"You added {user_input}")
+                            print(f"You added {user_input}")
+                else:
+                    size = handler.handler_item_size(order, user_input)
+                    order.add_raw_item(user_input, size)
+                    if size:
+                        print(f"You added {size} {user_input}")
+                    else:
+
+                        print(f"You added {user_input}")
 
         while user_input.lower() != "no":
             print_order(order)
@@ -79,12 +95,31 @@ if __name__ == "__main__":
                             handler.handler_meal_drinks(order, user_input),
                         )
                     else:
-                        size = handler.handler_item_size(order, user_input)
-                        order.add_raw_item(user_input, size)
-                        if size:
-                            print(f"You added {size} {user_input}")
+                        if order.is_burger(user_input):
+                            answer = input(
+                                "Do you want to customize this burger? (yes/no)\n").strip().lower()
+                            if answer == "yes":
+                                burger_data = handler.handler_burger(
+                                    order, user_input)
+                                order.user_order.append(burger_data)
+                                print("You castomized your burger")
+                            else:
+
+                                size = handler.handler_item_size(
+                                    order, user_input)
+                                order.add_raw_item(user_input, size)
+                                if size:
+                                    print(f"You added {size} {user_input}")
+                                else:
+                                    print(f"You added {user_input}")
                         else:
-                            print(f"You added {user_input}")
+                            size = handler.handler_item_size(order, user_input)
+                            order.add_raw_item(user_input, size)
+                            if size:
+                                print(f"You added {size} {user_input}")
+                            else:
+
+                                print(f"You added {user_input}")
 
         print(f"Total: {order.calculate_total():.2f}")
 

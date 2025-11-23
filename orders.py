@@ -4,7 +4,7 @@ import yaml
 class Order:
 
     def __init__(self):
-        #self.menu_data = self.load_menu("menu_virtual_items.yaml")
+        # self.menu_data = self.load_menu("menu_virtual_items.yaml")
         self.menu_ingredients = self.load_menu("menu_ingredients.yaml")
         self.user_order: list[dict] = []
 
@@ -26,6 +26,13 @@ class Order:
             "name": name,
             "additionals": additionals,
             "quantity": quantity,
+        })
+
+    def add_burger(self, name, additionals, removed):
+        self.user_order.append({
+            "name": name,
+            "additionals": additionals,
+            "removed": removed
         })
 
     def update_order(self, old_name, new_name):
@@ -96,7 +103,23 @@ class Order:
 
         return []
 
-    def calculate_total(self):
+    def get_burger_options(self, burger_name: str):
+        name_lower = burger_name.strip().lower()
+
+        for item in self.menu_ingredients.get("items", []):
+            item_name = item.get("name", "").strip().lower()
+            if item_name == name_lower and item.get("category") == "burgers":
+                return item
+        return None
+
+    def is_burger(self, name: str) -> bool:
+        name_lower = name.strip().lower()
+        for item in self.menu_ingredients.get("items", []):
+            if item.get("name", "").strip().lower() == name_lower and item.get("category") == "burgers":
+                return True
+        return False
+
+    def calculate_total(self) -> float:
         total = 0.0
 
         combos = self.menu_ingredients.get("combos", [])
@@ -105,43 +128,51 @@ class Order:
 
         new_structures_combos_by_name = {}
         for combo in combos:
-            key = combo["name"]
+            key = combo.get("name", "").strip().lower()
             new_structures_combos_by_name[key] = combo
 
         new_structures_items_by_name = {}
         for item in items:
-            key = item["name"]
+            key = item.get("name", "").strip().lower()
             new_structures_items_by_name[key] = item
 
         new_structures_ingredients_by_name = {}
         for ing in ingredients:
-            key = ing["name"]
+            key = ing.get("name", "").strip().lower()
             new_structures_ingredients_by_name[key] = ing
 
         for order_item in self.user_order:
             name = order_item.get("name")
+            if not name:
+                continue
+
+            key = name.strip().lower()
             quantity = order_item.get("quantity", 1)
 
-            if name in new_structures_combos_by_name:
-                combo = new_structures_combos_by_name[name]
-                price = float(combo["price"])
+            if key in new_structures_combos_by_name:
+                combo = new_structures_combos_by_name[key]
+                price = float(combo.get("price", 0.0))
                 total += price * quantity
-                continue
-            if name in new_structures_items_by_name:
-                item = new_structures_items_by_name[name]
-                price = float(item["price"])
-                total += price * quantity
-            if "additionals" in order_item:
-                additionals = order_item["additionals"]
-                if isinstance(additionals, dict):
-                    additionals = [additionals]
-                for add in additionals:
-                    add_name = add.get("name")
-                    add_number = add.get("number", 1)
-                    ing = new_structures_ingredients_by_name.get(add_name)
-                    if ing is None:
-                        continue
 
-                    ing_price = float(ing["price"])
-                    total += ing_price * add_number * quantity
+            elif key in new_structures_items_by_name:
+                item = new_structures_items_by_name[key]
+                price = float(item.get("price", 0.0))
+                total += price * quantity
+
+            additionals = order_item.get("additionals")or  []
+            if isinstance(additionals, dict):
+                additionals = [additionals]
+
+            for add in additionals:
+                add_name = add.get("name")
+                if not add_name:
+                    continue
+
+                add_key = add_name.strip().lower()
+                ing = new_structures_ingredients_by_name.get(add_key)
+                if not ing:
+                    continue
+                ing_price = float(ing.get("price", 0.0))
+                count = add.get("number", 1)
+                total += ing_price*count * quantity
         return total

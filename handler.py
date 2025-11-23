@@ -68,4 +68,59 @@ def handler_item_size(order, item_name: str) -> str:
         print("Wrong size, choose from the list\n")
 
 
-# def handler_burger(order, name, additionals=None, removed=None):
+def handler_burger(order, name: str, additionals=None, removed=None):
+    if "meal" in name.lower():
+        return {"name": name, "additionals": [], "removed": []}
+
+    burger = order.get_burger_options(name)
+    if burger is None:
+        print("We don't have this burger in menu\n")
+        return {"name": name, "additionals": [], "removed": []}
+
+    default_ings = burger.get("default_ingredients", [])
+    possible_ings = burger.get("possible_ingredients", [])
+
+    additionals: list[dict] = []
+    removed: list[dict] = []
+
+    print(f"\nCustomizing your {name}:\n")
+    if default_ings:
+        print(f"Default ingredients: {', '.join(default_ings)}\n")
+    if possible_ings:
+        print(f"Possible additions: {', '.join(possible_ings)}\n")
+
+    while True:
+        add = input(
+            "What ingredients do you want to add? press Enter for stop\n").strip()
+        if not add:
+            break
+
+        if add not in possible_ings:
+            print("We dont have this ingredients in menu\n")
+            continue
+
+        number_str = input(
+            f"How many {add} do you wan to add? (default 1) {add}\n").strip()
+        if number_str.isdigit():
+            number = int(number_str)
+        else:
+            number = 1
+        additionals.append({"name": add, "number": number})
+        print(f"Added {add} {number} times \n")
+
+    while True:
+        remove = input(
+            "What ingredients do you want to remove?Press Enter for not changing\n").strip()
+        if not remove:
+            break
+        if remove not in default_ings:
+            print("You can't remove this ingredient.")
+            continue
+        removed.append({"name": remove})
+        print(f"Removed {remove}\n")
+
+    return {
+        "name": burger["name"],
+        "additionals": additionals,
+        "removed": removed,
+    }
