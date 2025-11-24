@@ -68,7 +68,7 @@ def handler_item_size(order, item_name: str) -> str:
         print("Wrong size, choose from the list\n")
 
 
-def handler_burger(order, name: str, additionals=None, removed=None):
+def handler_burger(order, name: str):
     if "meal" in name.lower():
         return {"name": name, "additionals": [], "removed": []}
 

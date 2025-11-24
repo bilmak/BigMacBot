@@ -3,12 +3,12 @@ import yaml
 
 class Order:
 
-    def __init__(self):
+    def __init__(self)->None:
         # self.menu_data = self.load_menu("menu_virtual_items.yaml")
         self.menu_ingredients = self.load_menu("menu_ingredients.yaml")
         self.user_order: list[dict] = []
 
-    def add_raw_item(self, item_name: str, size: str):
+    def add_raw_item(self, item_name: str, size: str)->None:
         item = {"name": item_name}
         if size:
             item["size"] = size
