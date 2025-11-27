@@ -27,6 +27,12 @@ class Calculator:
             key = ing.get("name", "").strip().lower()
             new_structures_ingredients_by_name[key] = ing
 
+        size_changer = {
+            "small": 0.7,
+            "medium": 1.0,
+            "large": 1.25,
+        }
+
         for order_item in user_order:
             name = order_item.get("name")
             if not name:
@@ -43,12 +49,16 @@ class Calculator:
             elif key in new_structures_items_by_name:
                 item = new_structures_items_by_name[key]
                 price = float(item.get("price", 0.0))
-                total += price * quantity
+
+                size = order_item.get("size", "").lower()
+                changer = size_changer.get(size, 1.0)
+                price *= changer
+
+                total += price*quantity
 
             additionals = order_item.get("additionals") or []
             if isinstance(additionals, dict):
                 additionals = [additionals]
-
             for add in additionals:
                 add_name = add.get("name")
                 if not add_name:

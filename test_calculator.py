@@ -102,3 +102,47 @@ def test_mix_order_meal_and_custom_burgers():
 
     total = calc.calculate_total(user_order)
     assert round(total, 2) == 12.52
+
+
+def test_size_fries_small():
+    menu = Menu("menu_ingredients.yaml")
+    calc = Calculator(menu)
+
+    user_order = [{
+        "name": "French Fries", "size": "small"
+    }]
+    total = calc.calculate_total(user_order)
+    assert round(total, 2) == 1.39
+
+
+def test_size_fries_large():
+    menu = Menu("menu_ingredients.yaml")
+    calc = Calculator(menu)
+
+    user_order = [{
+        "name": "French Fries", "size": "large"
+    }]
+    total = calc.calculate_total(user_order)
+    assert round(total, 2) == 2.49
+
+
+def test_large_cola():
+    menu = Menu("menu_ingredients.yaml")
+    calc = Calculator(menu)
+
+    user_order = [{
+        "name": "Coca-Cola", "size": "large"
+    }]
+    total = calc.calculate_total(user_order)
+    assert round(total, 2) == 1.61
+
+
+def test_no_size_cola():
+    menu = Menu("menu_ingredients.yaml")
+    calc = Calculator(menu)
+
+    user_order = [{
+        "name": "Coca-Cola"
+    }]
+    total = calc.calculate_total(user_order)
+    assert round(total, 2) == 1.29
