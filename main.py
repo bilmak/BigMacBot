@@ -2,6 +2,44 @@ from llm import chat_with_gpt
 import orders
 import handler
 import json
+import upsell
+from menu import Menu
+import calculator
+
+
+def process_item(user_input: str, order: orders.Order, data_menu: Menu):
+    if not data_menu.is_item_in_menu(user_input):
+        print(f"We don't have {user_input} in menu\n")
+        return
+    if "meal" in user_input.lower():
+        order.add_meal(
+            user_input,
+            handler.handler_meal_fries(user_input),
+            handler.handler_meal_drinks(user_input),
+        )
+    else:
+        if data_menu.is_burger(user_input):
+            answer = input(
+                "Do you want to customize this burger? (yes/no)\n").strip().lower()
+            if answer == "yes":
+                burger_data = handler.handler_burger(user_input)
+                order.user_order.append(burger_data)
+                print("You customized your burger")
+            else:
+                size = handler.handler_item_size(user_input)
+                order.add_raw_item(user_input, size)
+                if size:
+                    print(f"You added {size} {user_input}")
+                else:
+
+                    print(f"You added {user_input}")
+        else:
+            size = handler.handler_item_size(user_input)
+            order.add_raw_item(user_input, size)
+            if size:
+                print(f"You added {size} {user_input}")
+            else:
+                print(f"You added {user_input}")
 
 
 def print_order(order):
@@ -14,48 +52,17 @@ def print_order(order):
 
 if __name__ == "__main__":
     order = orders.Order()
+    upsells = upsell.Upseller(order)
+    data_menu = Menu("menu_ingredients.yaml")
+    calcul = calculator.Calculator(data_menu)
 
     user_input = input("What do you want to order?\n").strip()
-    if user_input.lower() == "no":
-        print("Ok, no order.")
+    if user_input.lower() in ("no", ""):
+        print("Ok, no order")
     else:
-        if not order.is_item_in_menu(user_input):
-            print(f"We don't have {user_input} in menu\n")
-        else:
-            if "meal" in user_input.lower():
-                order.add_meal(
-                    user_input,
-                    handler.handler_meal_fries(order, user_input),
-                    handler.handler_meal_drinks(order, user_input),
-                )
-            else:
-                if order.is_burger(user_input):
-                    answer = input(
-                        "Do you want to customize this burger? (yes/no)\n").strip().lower()
-                    if answer == "yes":
-                        burger_data = handler.handler_burger(order, user_input)
-                        order.user_order.append(burger_data)
-                        print("You castomized your burger")
-                    else:
-                        size = handler.handler_item_size(order, user_input)
-                        order.add_raw_item(user_input, size)
-                        if size:
-                            print(f"You added {size} {user_input}")
-                        else:
-
-                            print(f"You added {user_input}")
-                else:
-                    size = handler.handler_item_size(order, user_input)
-                    order.add_raw_item(user_input, size)
-                    if size:
-                        print(f"You added {size} {user_input}")
-                    else:
-
-                        print(f"You added {user_input}")
-
+        process_item(user_input, order, data_menu)
         while user_input.lower() != "no":
             print_order(order)
-
             print(
                 "\nIf you want to add something else, write it below."
                 "\nIf you want to delete an item, type: delete <item name>."
@@ -85,42 +92,9 @@ if __name__ == "__main__":
                 order.update_order(old_name, new_name)
 
             else:
-                if not order.is_item_in_menu(user_input):
-                    print(f"We don't have {user_input} in menu\n")
-                else:
-                    if "meal" in user_input.lower():
-                        order.add_meal(
-                            user_input,
-                            handler.handler_meal_fries(order, user_input),
-                            handler.handler_meal_drinks(order, user_input),
-                        )
-                    else:
-                        if order.is_burger(user_input):
-                            answer = input(
-                                "Do you want to customize this burger? (yes/no)\n").strip().lower()
-                            if answer == "yes":
-                                burger_data = handler.handler_burger(
-                                    order, user_input)
-                                order.user_order.append(burger_data)
-                                print("You castomized your burger")
-                            else:
+                process_item(user_input, order, data_menu)
 
-                                size = handler.handler_item_size(
-                                    order, user_input)
-                                order.add_raw_item(user_input, size)
-                                if size:
-                                    print(f"You added {size} {user_input}")
-                                else:
-                                    print(f"You added {user_input}")
-                        else:
-                            size = handler.handler_item_size(order, user_input)
-                            order.add_raw_item(user_input, size)
-                            if size:
-                                print(f"You added {size} {user_input}")
-                            else:
-
-                                print(f"You added {user_input}")
-
-        print(f"Total: {order.calculate_total():.2f}")
-
+        print(f"Total: {calcul.calculate_total(order.user_order):.2f}")
+        # upsellr = upsell.Upseller(order)
         print("Items:", json.dumps(order.user_order))
+        # upsells.find_products_to_upsell()

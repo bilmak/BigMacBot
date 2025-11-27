@@ -1,9 +1,13 @@
+import menu
 
-def handler_meal_fries(order, meal_name: str) -> str:
-    if "meal" not in meal_name.lower() or not order.is_item_in_menu(meal_name):
+menu_data = menu.Menu("menu_ingredients.yaml")
+
+
+def handler_meal_fries(meal_name: str) -> str:
+    if "meal" not in meal_name.lower() or not menu_data.is_item_in_menu(meal_name):
         return ""
 
-    fries_options = order.get_combo_slot_fries(meal_name)
+    fries_options = menu_data.get_combo_slot_fries(meal_name)
 
     input_type_of_fries = input(
         f"What kind of fries do you want?\nOptions: {', '.join(fries_options)}\n"
@@ -21,11 +25,11 @@ def handler_meal_fries(order, meal_name: str) -> str:
     return "French Fries"
 
 
-def handler_meal_drinks(order, meal_name: str) -> str:
-    if "meal" not in meal_name.lower() or not order.is_item_in_menu(meal_name):
+def handler_meal_drinks(meal_name: str) -> None | str:
+    if "meal" not in meal_name.lower() or not menu_data.is_item_in_menu(meal_name):
         return ""
 
-    drinks_options = order.get_combo_slot_drinks(meal_name)
+    drinks_options = menu_data.get_combo_slot_drinks(meal_name)
     while True:
         input_type_of_drinks = input(
             f"What kind of drinks do you want?\nOptions: {', '.join(drinks_options)}\n"
@@ -40,11 +44,28 @@ def handler_meal_drinks(order, meal_name: str) -> str:
         )
 
 
-def handler_item_size(order, item_name: str) -> str:
+def handler_desserts(order, dessert_name: str) -> None | str:
+    if "meal" in dessert_name.lower():
+        return ""
+    desserts = menu_data.get_desserts_options()
+    dessert_list = "\n".join(f"- {d}" for d in desserts)
+    while True:
+        message = input(
+            f"Do you want to order dessert? We have:\n{dessert_list}\n yes/no?").strip().lower()
+        if message in ("no", "n", ""):
+            return
+        if message in ("yes", "y"):
+            dessert_input = input("What dessert do you want?\n").strip()
+            order.add_raw_item(dessert_input)
+            print(f"Added {dessert_input} to your order\n")
+            return
+
+
+def handler_item_size(item_name: str) -> None | str:
     if "meal" in item_name.lower():
         return ""
 
-    size_options = order.get_item_sizes(item_name)
+    size_options = menu_data.get_item_sizes(item_name)
     # only for milk
     if not size_options:
         return ""
@@ -68,11 +89,11 @@ def handler_item_size(order, item_name: str) -> str:
         print("Wrong size, choose from the list\n")
 
 
-def handler_burger(order, name: str):
+def handler_burger(name: str) -> dict:
     if "meal" in name.lower():
         return {"name": name, "additionals": [], "removed": []}
 
-    burger = order.get_burger_options(name)
+    burger = menu_data.get_burger_options(name)
     if burger is None:
         print("We don't have this burger in menu\n")
         return {"name": name, "additionals": [], "removed": []}
