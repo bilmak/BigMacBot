@@ -1,10 +1,12 @@
-import yaml
+
 from menu import Menu
+from menu import MenuUpsell
 
 
 class Order:
     def __init__(self) -> None:
         self.menu = Menu("menu_ingredients.yaml")
+        # self.menu_upsell = MenuUpsell("menu_upsells.yaml")
         self.user_order: list[dict] = []
 
     def add_raw_item(self, item_name: str, size: str | None = None) -> None:
@@ -49,5 +51,3 @@ class Order:
                 print(f"You removed {item_name}\n")
                 return
         print(f"Item '{item_name}' not found in your order")
-
-    

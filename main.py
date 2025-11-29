@@ -4,6 +4,7 @@ import handler
 import json
 import upsell
 from menu import Menu
+from menu import MenuUpsell
 import calculator
 
 
@@ -21,7 +22,7 @@ def process_item(user_input: str, order: orders.Order, data_menu: Menu):
         if data_menu.is_burger(user_input):
             answer = input(
                 "Do you want to customize this burger? (yes/no)\n").strip().lower()
-            if answer == "yes":
+            if answer in ("yes", "y", "ye"):
                 burger_data = handler.handler_burger(user_input)
                 order.user_order.append(burger_data)
                 print("You customized your burger")
@@ -52,9 +53,10 @@ def print_order(order):
 
 if __name__ == "__main__":
     order = orders.Order()
-    upsells = upsell.Upseller(order)
     data_menu = Menu("menu_ingredients.yaml")
+    data_menu_upsell = MenuUpsell("menu_upsells.yaml")
     calcul = calculator.Calculator(data_menu)
+    upsells = upsell.Upseller(order, data_menu_upsell)
 
     user_input = input("What do you want to order?\n").strip()
     if user_input.lower() in ("no", ""):
@@ -93,8 +95,6 @@ if __name__ == "__main__":
 
             else:
                 process_item(user_input, order, data_menu)
-
+        upsells.offer_dessert()
         print(f"Total: {calcul.calculate_total(order.user_order):.2f}")
-        # upsellr = upsell.Upseller(order)
         print("Items:", json.dumps(order.user_order))
-        # upsells.find_products_to_upsell()

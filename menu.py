@@ -67,13 +67,6 @@ class Menu:
 
         return []
 
-    def get_desserts_options(self) -> list:
-        desserts = []
-        for item in self.data.get("items", []):
-            if item.get("category") == "desserts":
-                desserts.append(item.get("name"))
-        return desserts
-
     def is_burger(self, name: str) -> bool:
         name_lower = name.strip().lower()
         for item in self.data.get("items", []):
@@ -114,3 +107,27 @@ class Menu:
             if name == name_lower:
                 return float(ing.get("price", 0.0))
         return 0.0
+
+
+class MenuUpsell:
+    def __init__(self, file_path: str) -> None:
+        self.data = self.load_menu(file_path)
+
+    def load_menu(self, file_path: str) -> list:
+        with open(file_path, "r") as file:
+            data = yaml.safe_load(file)
+        return data
+
+    def get_desserts_options(self) -> list:
+        desserts = []
+        for item in self.data.get("items", []):
+            if item.get("category") == "desserts":
+                desserts.append(item.get("name"))
+        return desserts
+
+    def is_burger(self, name: str) -> bool:
+        name_lower = name.strip().lower()
+        for item in self.data.get("items", []):
+            if item.get("name", "").strip().lower() == name_lower and item.get("category") == "burgers":
+                return True
+        return False
