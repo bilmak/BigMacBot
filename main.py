@@ -1,4 +1,4 @@
-from llm import chat_with_gpt
+# from llm import chat_with_gpt
 import orders
 import handler
 import json
@@ -20,6 +20,8 @@ def process_item(user_input: str, order: orders.Order, data_menu: Menu):
         )
     else:
         if data_menu.is_burger(user_input):
+            if order.offer_meal_upsell(user_input):
+                return
             answer = input(
                 "Do you want to customize this burger? (yes/no)\n").strip().lower()
             if answer in ("yes", "y", "ye"):

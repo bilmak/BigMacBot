@@ -36,5 +36,3 @@ class Upseller:
         else:
             self.order.add_raw_item(choice_dessert)
             print(f"You add {choice_dessert} to your order")
-            
-    

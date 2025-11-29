@@ -1,6 +1,7 @@
 import menu
 
 menu_data = menu.Menu("menu_ingredients.yaml")
+menu_data_upsell = menu.MenuUpsell("menu_upsells.yaml")
 
 
 def handler_meal_fries(meal_name: str) -> str:
@@ -47,7 +48,7 @@ def handler_meal_drinks(meal_name: str) -> None | str:
 def handler_desserts(order, dessert_name: str) -> None | str:
     if "meal" in dessert_name.lower():
         return ""
-    desserts = menu_data.get_desserts_options()
+    desserts = menu_data_upsell.get_desserts_options()
     dessert_list = "\n".join(f"- {d}" for d in desserts)
     while True:
         message = input(

@@ -113,7 +113,7 @@ class MenuUpsell:
     def __init__(self, file_path: str) -> None:
         self.data = self.load_menu(file_path)
 
-    def load_menu(self, file_path: str) -> list:
+    def load_menu(self, file_path: str) -> dict:
         with open(file_path, "r") as file:
             data = yaml.safe_load(file)
         return data
@@ -130,4 +130,13 @@ class MenuUpsell:
         for item in self.data.get("items", []):
             if item.get("name", "").strip().lower() == name_lower and item.get("category") == "burgers":
                 return True
+        return False
+
+    def get_combo_for_burger(self, name_burger: str):
+        meal_name = name_burger.strip() + " Meal"
+        combos = self.data.get("combos", {})
+
+        for combo in combos:
+            if combo.get("name", "") == meal_name:
+                return combo
         return False

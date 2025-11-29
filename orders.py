@@ -1,12 +1,13 @@
 
 from menu import Menu
 from menu import MenuUpsell
+import handler
 
 
 class Order:
     def __init__(self) -> None:
         self.menu = Menu("menu_ingredients.yaml")
-        # self.menu_upsell = MenuUpsell("menu_upsells.yaml")
+        self.menu_upsell = MenuUpsell("menu_upsells.yaml")
         self.user_order: list[dict] = []
 
     def add_raw_item(self, item_name: str, size: str | None = None) -> None:
@@ -15,21 +16,21 @@ class Order:
             item["size"] = size
         self.user_order.append(item)
 
-    def add_meal(self, meal_name: str, fries: str, drink: str) -> list:
+    def add_meal(self, meal_name: str, fries: str, drink: str):
         self.user_order.append({
             "name": meal_name,
             "fries": fries,
             "drink": drink,
         })
 
-    def add_burger_ingredients(self, name, additionals, quantity) -> list:
+    def add_burger_ingredients(self, name, additionals, quantity):
         self.user_order.append({
             "name": name,
             "additionals": additionals,
             "quantity": quantity,
         })
 
-    def add_burger(self, name, additionals, removed) -> list:
+    def add_burger(self, name, additionals, removed):
         self.user_order.append({
             "name": name,
             "additionals": additionals,
@@ -51,3 +52,22 @@ class Order:
                 print(f"You removed {item_name}\n")
                 return
         print(f"Item '{item_name}' not found in your order")
+
+    def offer_meal_upsell(self, burger_name: str) -> bool:
+        combo = self.menu_upsell.get_combo_for_burger(burger_name)
+        if combo is None:
+            return False
+
+        combo_name = combo.get("name")
+        combo_price = combo.get("price")
+
+        answer = input(
+            f"Do you want upgrade your {burger_name} to {combo_name}? yes/no\n").lower().strip()
+        if answer not in ("yes", "y", "ye"):
+            return False
+
+        potato = handler.handler_meal_fries(combo_name)
+        drink = handler.handler_meal_drinks(combo_name)
+        self.add_meal(combo_name, potato, drink)
+        print(f"You upgraded your burger to {combo_name}\n")
+        return True
