@@ -1,13 +1,11 @@
 
-from menu import Menu
-from menu import MenuUpsell
-import handler
+from .menu import Menu, MenuUpsell
 
 
 class Order:
     def __init__(self) -> None:
-        self.menu = Menu("menu_ingredients.yaml")
-        self.menu_upsell = MenuUpsell("menu_upsells.yaml")
+        self.menu = Menu("data/menu_ingredients.yaml")
+        self.menu_upsell = MenuUpsell("data/menu_upsells.yaml")
         self.user_order: list[dict] = []
 
     def add_raw_item(self, item_name: str, size: str | None = None) -> None:

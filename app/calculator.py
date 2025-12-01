@@ -1,4 +1,4 @@
-from menu import Menu, MenuUpsell
+from .menu import Menu, MenuUpsell
 
 
 class Calculator:

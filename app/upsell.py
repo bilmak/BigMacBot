@@ -1,12 +1,11 @@
-import orders
-import menu
-import handler
+from . import handler, orders
+from .menu import Menu, MenuUpsell
 
 
 class Upseller:
-    def __init__(self, order, m_menu):
+    def __init__(self, order, m_menu: MenuUpsell):
         self.order: orders.Order = order
-        self.m_menu: menu.MenuUpsell = m_menu
+        self.m_menu: MenuUpsell = m_menu
         self.dessert_offered = False
 
     def has_burger_or_meal(self) -> bool:

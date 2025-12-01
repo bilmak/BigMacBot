@@ -1,10 +1,6 @@
-# from llm import chat_with_gpt
-import orders
-import handler
+from . import orders, handler, upsell, calculator
 import json
-import upsell
-from menu import Menu, MenuUpsell
-import calculator
+from .menu import Menu, MenuUpsell
 
 
 def process_item(user_input: str, order: orders.Order, data_menu: Menu, upsells: upsell.Upseller):
@@ -58,8 +54,8 @@ def print_order(order):
 
 if __name__ == "__main__":
     order = orders.Order()
-    data_menu = Menu("menu_ingredients.yaml")
-    data_menu_upsell = MenuUpsell("menu_upsells.yaml")
+    data_menu = Menu("data/menu_ingredients.yaml")
+    data_menu_upsell = MenuUpsell("data/menu_upsells.yaml")
     calcul = calculator.Calculator(data_menu, data_menu_upsell)
     upsells = upsell.Upseller(order, data_menu_upsell)
 

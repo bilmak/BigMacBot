@@ -1,7 +1,7 @@
-import menu
+from . import menu
 
-menu_data = menu.Menu("menu_ingredients.yaml")
-menu_data_upsell = menu.MenuUpsell("menu_upsells.yaml")
+menu_data = menu.Menu("data/menu_ingredients.yaml")
+menu_data_upsell = menu.MenuUpsell("data/menu_upsells.yaml")
 
 
 def handler_meal_fries(meal_name: str) -> str:
