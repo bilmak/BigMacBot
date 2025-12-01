@@ -3,12 +3,12 @@ import orders
 import handler
 import json
 import upsell
-from menu import Menu
-from menu import MenuUpsell
+from menu import Menu, MenuUpsell
 import calculator
 
 
-def process_item(user_input: str, order: orders.Order, data_menu: Menu):
+def process_item(user_input: str, order: orders.Order, data_menu: Menu, upsells: upsell.Upseller):
+
     if not data_menu.is_item_in_menu(user_input):
         print(f"We don't have {user_input} in menu\n")
         return
@@ -18,9 +18,12 @@ def process_item(user_input: str, order: orders.Order, data_menu: Menu):
             handler.handler_meal_fries(user_input),
             handler.handler_meal_drinks(user_input),
         )
+        sauce = handler.handler_sauce(user_input)
+        if sauce:
+            order.add_raw_item(sauce)
     else:
         if data_menu.is_burger(user_input):
-            if order.offer_meal_upsell(user_input):
+            if upsells.offer_meal_upsell(user_input):
                 return
             answer = input(
                 "Do you want to customize this burger? (yes/no)\n").strip().lower()
@@ -57,14 +60,14 @@ if __name__ == "__main__":
     order = orders.Order()
     data_menu = Menu("menu_ingredients.yaml")
     data_menu_upsell = MenuUpsell("menu_upsells.yaml")
-    calcul = calculator.Calculator(data_menu)
+    calcul = calculator.Calculator(data_menu, data_menu_upsell)
     upsells = upsell.Upseller(order, data_menu_upsell)
 
     user_input = input("What do you want to order?\n").strip()
     if user_input.lower() in ("no", ""):
         print("Ok, no order")
     else:
-        process_item(user_input, order, data_menu)
+        process_item(user_input, order, data_menu, upsells)
         while user_input.lower() != "no":
             print_order(order)
             print(
@@ -96,7 +99,11 @@ if __name__ == "__main__":
                 order.update_order(old_name, new_name)
 
             else:
-                process_item(user_input, order, data_menu)
+                process_item(user_input, order, data_menu, upsells)
         upsells.offer_dessert()
-        print(f"Total: {calcul.calculate_total(order.user_order):.2f}")
+        total = calcul.calculate_total(order.user_order)
+
+        if calcul.discount:
+            print("\tYou received a 20% discount on 2 combo meals!\n")
+        print(f"Total: {total:.2f}")
         print("Items:", json.dumps(order.user_order))

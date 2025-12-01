@@ -5,7 +5,7 @@ menu_data_upsell = menu.MenuUpsell("menu_upsells.yaml")
 
 
 def handler_meal_fries(meal_name: str) -> str:
-    if "meal" not in meal_name.lower() or not menu_data.is_item_in_menu(meal_name):
+    if "meal" not in meal_name.lower():
         return ""
 
     fries_options = menu_data.get_combo_slot_fries(meal_name)
@@ -27,14 +27,14 @@ def handler_meal_fries(meal_name: str) -> str:
 
 
 def handler_meal_drinks(meal_name: str) -> None | str:
-    if "meal" not in meal_name.lower() or not menu_data.is_item_in_menu(meal_name):
+    if "meal" not in meal_name.lower():
         return ""
 
     drinks_options = menu_data.get_combo_slot_drinks(meal_name)
     while True:
         input_type_of_drinks = input(
             f"What kind of drinks do you want?\nOptions: {', '.join(drinks_options)}\n"
-        ).strip()
+        )
 
         if input_type_of_drinks in drinks_options:
             print(f"You ordered {meal_name} with {input_type_of_drinks}")
@@ -146,3 +146,23 @@ def handler_burger(name: str) -> dict:
         "additionals": additionals,
         "removed": removed,
     }
+
+
+def handler_sauce(meal_name: str) -> str:
+    if "meal" not in meal_name.lower():
+        return ""
+
+    sauce_options = menu_data_upsell.get_souce_options_for_meal(meal_name)
+    if not sauce_options:
+        return ""
+
+    answer = input(
+        f"Do you want to add sauce to your burger meal? Options: {','.join(sauce_options)} (yes/no)\n").strip().lower()
+    if answer not in ("yes", "y", "ye"):
+        return ""
+    sauce_choice = input("What kind of sauce do you want to add?\n").strip()
+    if sauce_choice in sauce_options:
+        print(f"Added {sauce_choice} to your order\n")
+        return sauce_choice
+    print("We dont have this type of sauce. No sauce added\n")
+    return ""

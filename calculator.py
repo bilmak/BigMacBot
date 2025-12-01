@@ -1,12 +1,15 @@
-from menu import Menu
+from menu import Menu, MenuUpsell
 
 
 class Calculator:
-    def __init__(self, menu: Menu):
+    def __init__(self, menu: Menu, menuUpsell: MenuUpsell):
         self.menu = menu
+        self.menuUpsell = menuUpsell
+        self.discount = False
 
     def calculate_total(self, user_order: list[dict]) -> float:
         total = 0.0
+        self.discount = False
 
         combos = self.menu.data.get("combos", [])
         items = self.menu.data.get("items", [])
@@ -33,6 +36,24 @@ class Calculator:
             "large": 1.25,
         }
 
+        combo_count = 0
+
+        for order_item in user_order:
+            name = order_item.get("name")
+            if not name:
+                continue
+
+            key = name.lower()
+            quantity = order_item.get("quantity", 1)
+
+            if key in new_structures_combos_by_name:
+                combo_count += quantity
+
+        discounted_combos_left = 0
+        if combo_count >= 2:
+            discounted_combos_left = 2
+            self.discount = True
+
         for order_item in user_order:
             name = order_item.get("name")
             if not name:
@@ -41,10 +62,23 @@ class Calculator:
             key = name.strip().lower()
             quantity = order_item.get("quantity", 1)
 
+            sauce_price = self.menuUpsell.get_sauce_price(name)
+            if sauce_price > 0:
+                total += sauce_price*quantity
+                continue
+
             if key in new_structures_combos_by_name:
                 combo = new_structures_combos_by_name[key]
                 price = float(combo.get("price", 0.0))
-                total += price * quantity
+                if discounted_combos_left > 0:
+                    disc = min(quantity, discounted_combos_left)
+                    normal = quantity - disc
+
+                    total += price*0.8*disc
+                    total += price * normal
+                    discounted_combos_left -= disc
+                else:
+                    total += price*quantity
 
             elif key in new_structures_items_by_name:
                 item = new_structures_items_by_name[key]

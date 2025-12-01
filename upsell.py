@@ -1,5 +1,6 @@
 import orders
 import menu
+import handler
 
 
 class Upseller:
@@ -36,3 +37,25 @@ class Upseller:
         else:
             self.order.add_raw_item(choice_dessert)
             print(f"You add {choice_dessert} to your order")
+
+    def offer_meal_upsell(self, burger_name: str) -> bool:
+        combo = self.m_menu.get_combo_for_burger(burger_name)
+        if combo is None:
+            return False
+
+        combo_name = combo.get("name")
+        combo_price = combo.get("price")
+
+        answer = input(
+            f"Do you want upgrade your {burger_name} to {combo_name} for {combo_price:.2f}? yes/no\n").lower()
+        if answer not in ("yes", "y", "ye"):
+            return False
+
+        potato = handler.handler_meal_fries(combo_name)
+        drink = handler.handler_meal_drinks(combo_name)
+        self.order.add_meal(combo_name, potato, drink)
+        sauce = handler.handler_sauce(combo_name)
+        if sauce:
+            self.order.add_raw_item(sauce)
+        print(f"You upgraded your burger to {combo_name}\n")
+        return True

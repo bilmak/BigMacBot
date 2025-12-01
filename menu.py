@@ -23,7 +23,7 @@ class Menu:
         return names
 
     def is_item_in_menu(self, item_name: str) -> bool:
-        item_name = item_name.lower().strip()
+        item_name = item_name.strip().lower()
         for name in self.menu_names():
             if item_name == name.strip().lower():
                 return True
@@ -134,9 +134,30 @@ class MenuUpsell:
 
     def get_combo_for_burger(self, name_burger: str):
         meal_name = name_burger.strip() + " Meal"
-        combos = self.data.get("combos", {})
+        combos = self.data.get("combos", [])
 
         for combo in combos:
             if combo.get("name", "") == meal_name:
                 return combo
-        return False
+        return None
+
+    def get_sauce_price(self, name: str) -> float:
+        items = self.data.get("items", [])
+
+        for item in items:
+            if item.get("category") == "sauces":
+                if item.get("name", "").lower() == name.strip().lower():
+                    return float(item.get("price", 0.0))
+        return 0.0
+
+    def get_souce_options_for_meal(self, burger_meal) -> list:
+        combos = self.data.get("combos", [])
+
+        for combo in combos:
+            combo_name = combo.get("name", "")
+            if combo_name.lower() == burger_meal.lower():
+                slots = combo.get("slots", {})
+                sauces_options = slots.get("sauces", {})
+                options = sauces_options.get("options", [])
+                return options
+        return []
