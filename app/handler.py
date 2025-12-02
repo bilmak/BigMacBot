@@ -157,12 +157,17 @@ def handler_sauce(meal_name: str) -> str:
         return ""
 
     answer = input(
-        f"Do you want to add sauce to your burger meal? Options: {','.join(sauce_options)} (yes/no)\n").strip().lower()
-    if answer not in ("yes", "y", "ye"):
+        f"Do you want to add sauce to your burger meal?\n"
+        f"Options: {', '.join(sauce_options)}\n"
+        "Type sauce name or 'no' to skip\n").strip()
+
+    if not answer or answer.lower() in ("no", 'n'):
         return ""
-    sauce_choice = input("What kind of sauce do you want to add?\n").strip()
-    if sauce_choice in sauce_options:
-        print(f"Added {sauce_choice} to your order\n")
-        return sauce_choice
+
+    for s in sauce_options:
+        if s.lower() == answer.lower():
+            print(f"Added {s} to your order\n")
+            return s
+
     print("We dont have this type of sauce. No sauce added\n")
     return ""

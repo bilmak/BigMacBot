@@ -44,12 +44,12 @@ def process_item(user_input: str, order: orders.Order, data_menu: Menu, upsells:
                 print(f"You added {user_input}")
 
 
-def print_order(order):
-    if not order.user_order:
-        print("Your order: []\n")
-        return
+# def print_order(order):
+#     if not order.user_order:
+#         print("Your order: []\n")
+#         return
 
-    print("Your order:", json.dumps(order.user_order), "\n")
+#     print("Your order:", json.dumps(order.user_order), "\n")
 
 
 if __name__ == "__main__":
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     else:
         process_item(user_input, order, data_menu, upsells)
         while user_input.lower() != "no":
-            print_order(order)
+            #print_order(order)
             print(
                 "\nIf you want to add something else, write it below."
                 "\nIf you want to delete an item, type: delete <item name>."
@@ -99,7 +99,5 @@ if __name__ == "__main__":
         upsells.offer_dessert()
         total = calcul.calculate_total(order.user_order)
 
-        if calcul.discount:
-            print("\tYou received a 20% discount on 2 combo meals!\n")
         print(f"Total: {total:.2f}")
         print("Items:", json.dumps(order.user_order))
