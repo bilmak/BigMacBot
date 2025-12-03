@@ -1,3 +1,7 @@
+from app.calculator import Calculator
+from app.menu import Menu, MenuUpsell
+from app.menu import Menu, MenuUpsell
+from app.calculator import Calculator
 import pytest
 from app.menu import Menu, MenuUpsell
 from app.calculator import Calculator
@@ -173,3 +177,44 @@ def test_meal_with_sauce():
     }]
     total = calc.calculate_total(user_order)
     assert round(total, 2) == 8.24
+
+
+def test_double_deal_simple_case():
+    menu = Menu("data/menu_ingredients.yaml")
+    ups = MenuUpsell("data/menu_upsells.yaml")
+    calc = Calculator(menu, ups)
+    pr = {}
+    for it in menu.data["items"]:
+        pr[it["name"]] = it["price"]
+
+    order = [
+        {"name": "Hamburger", "quantity": 1, "double_deal": True},
+        {"name": "Cheeseburger", "quantity": 1, "double_deal": True}
+    ]
+
+    got = calc.calculate_total(order)
+
+    expect = (pr["Hamburger"] + pr["Cheeseburger"]) * 0.8
+
+    assert round(got, 2) == round(expect, 2)
+
+
+def test_double_deal_plus_regular_item():
+    menu = Menu("data/menu_ingredients.yaml")
+    upsell = MenuUpsell("data/menu_upsells.yaml")
+    calc = Calculator(menu, upsell)
+
+    prices = {i["name"]: i["price"] for i in menu.data["items"]}
+
+    order = [
+        {"name": "Hamburger", "quantity": 1, "double_deal": True},
+        {"name": "Cheeseburger", "quantity": 1, "double_deal": True},
+        {"name": "Filet-O-Fish", "quantity": 1}
+    ]
+
+    expected_total = (prices["Hamburger"] + prices["Cheeseburger"]) * 0.8
+    expected_total += prices["Filet-O-Fish"]
+
+    result = calc.calculate_total(order)
+
+    assert abs(result - expected_total) < 0.01

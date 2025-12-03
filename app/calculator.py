@@ -33,6 +33,7 @@ class Calculator:
             "medium": 1.0,
             "large": 1.25,
         }
+        double_deal_burgers = []
 
         sauces = self.menuUpsell.data.get("items", [])
         sauces_by_name = {}
@@ -75,7 +76,11 @@ class Calculator:
 
                 size = order_item.get("size", "").lower()
                 price *= size_changer.get(size, 1.0)
-                total += price*quantity
+                line_total = price*quantity
+
+                if item.get("category") == "burgers" and order_item.get("double_deal"):
+                    double_deal_burgers.append(line_total)
+                total += line_total
 
                 if item.get("category") == "burgers":
 
@@ -94,4 +99,8 @@ class Calculator:
                         ing_price = float(ing.get("price", 0.0))
                         count = add.get("number", 1)
                         total += ing_price*count * quantity
+        if len(double_deal_burgers) >= 2:
+            discount = double_deal_burgers[0]+double_deal_burgers[1]
+            base = discount*0.2
+            total -= base
         return total
