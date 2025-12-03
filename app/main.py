@@ -9,6 +9,10 @@ def process_item(user_input: str,
                  data_menu: Menu,
                  upsells: upsell.Upseller,
                  double_deals: DoubleDeals):
+    text = user_input.strip().lower()
+    if text in ("deal", "double", "deals", "double deal"):
+        handler.handler_deals_keyword(double_deals, order)
+        return
 
     if not data_menu.is_item_in_menu(user_input):
         print(f"We don't have {user_input} in menu\n")
@@ -24,32 +28,9 @@ def process_item(user_input: str,
             order.add_raw_item(sauce)
     else:
         if data_menu.is_burger(user_input):
-            deal = double_deals.get_deal_for_burger(user_input)
-            if deal:
-                deal_name = deal.get("name", "Double Deal")
-                possible_items = deal.get("possible_items", [])
-                print(f"This burger is part of {deal_name}")
-                print(
-                    "Available burgers for this Double Deal:")
-                for item in possible_items:
-                    print(f"- {item}")
-                raw = input(
-                    "Do you want to create a Double Deal and get 20% discount on 2 burgers?/n").strip().lower()
-                if raw in ("yes", "ye", "y"):
-                    burgers_chosen = [user_input]
-                    while len(burgers_chosen) < 2:
-                        second = input(
-                            "Please choose the second burger from list").strip()
-                        if second not in possible_items:
-                            print("We dont have this burger in menu, try again")
-                            continue
-                        burgers_chosen.append(second)
-                    for burger_name in burgers_chosen:
-                        order.add_raw_item(burger_name)
-                        order.user_order[-1]["double_deal"] = True
-                    print(
-                        f"Double Deal added:{burgers_chosen[0]} and {burgers_chosen[1]} with 20% discont\n")
-                    return
+            if handler.handler_double_deal(user_input, double_deals, order):
+                return
+
             if upsells.offer_meal_upsell(user_input):
                 return
             answer = input(
@@ -75,14 +56,6 @@ def process_item(user_input: str,
                 print(f"You added {user_input}")
 
 
-# def print_order(order):
-#     if not order.user_order:
-#         print("Your order: []\n")
-#         return
-
-#     print("Your order:", json.dumps(order.user_order), "\n")
-
-
 if __name__ == "__main__":
     order = orders.Order()
     data_menu = Menu("data/menu_ingredients.yaml")
@@ -97,7 +70,6 @@ if __name__ == "__main__":
     else:
         process_item(user_input, order, data_menu, upsells, double_deal)
         while user_input.lower() != "no":
-            # print_order(order)
             print(
                 "\nIf you want to add something else, write it below."
                 "\nIf you want to delete an item, type: delete <item name>."
@@ -130,6 +102,10 @@ if __name__ == "__main__":
                 process_item(user_input, order, data_menu,
                              upsells, double_deal)
         upsells.offer_dessert()
+        double_count = sum(
+            1 for item in order.user_order if item.get("double_deal"))
+        if double_count >= 2:
+            print("Double Deal: 20 % discount applied to two burgers!")
         total = calcul.calculate_total(order.user_order)
 
         print(f"Total: {total:.2f}")

@@ -12,8 +12,17 @@ class DoubleDeals:
 
     def get_deal_for_burger(self, burger_name) -> dict | None:
         burger_name = burger_name.strip().lower()
+
         for deal in self.data.get("deals", []):
             for item in deal.get("possible_items", []):
-                if item.strip().lower == burger_name:
+                if item.strip().lower() == burger_name:
                     return deal
+        return None
+
+    def get_deal_by_name(self, name: str) -> dict | None:
+        name = name.strip().lower()
+
+        for deal in self.data.get("deals", []):
+            if deal.get("name", "").strip().lower() == name:
+                return deal
         return None

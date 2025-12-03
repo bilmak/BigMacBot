@@ -1,4 +1,6 @@
 from . import menu
+from .double_deals import DoubleDeals
+from .orders import Order
 
 menu_data = menu.Menu("data/menu_ingredients.yaml")
 menu_data_upsell = menu.MenuUpsell("data/menu_upsells.yaml")
@@ -171,3 +173,77 @@ def handler_sauce(meal_name: str) -> str:
 
     print("We dont have this type of sauce. No sauce added\n")
     return ""
+
+
+def handler_double_deal(burger_name: str, double_deals: DoubleDeals, order: Order) -> bool:
+    deal = double_deals.get_deal_for_burger(burger_name)
+    if not deal:
+        return False
+
+    deal_name = deal.get("name", "Double Deal")
+    possible_items = deal.get("possible_items", [])
+
+    print(f"This burger is part of {deal_name}")
+    print("Available burgers for this Double Deal:")
+    for item in possible_items:
+        print(f"- {item}")
+    raw = input(
+        "Do you want to create a Double Deal and get 20% discount on 2 burgers?\n").strip().lower()
+    if raw not in ("yes", "ye", "y"):
+        return False
+
+    burgers_chosen = [burger_name]
+    while len(burgers_chosen) < 2:
+        second = input("Please choose the second burger from list\n").strip()
+        if second not in possible_items:
+            print("We dont have this burger in menu, try again\n")
+            continue
+        burgers_chosen.append(second)
+
+    for b_name in burgers_chosen:
+        order.add_raw_item(b_name)
+        order.user_order[-1]["double_deal"] = True
+        print(
+            f"Double Deal added:{burgers_chosen[0]} and {burgers_chosen[1]} with 20% discont\n")
+    return True
+
+
+def handler_deals_keyword(double_deals: DoubleDeals, order: Order) -> bool:
+
+    small = double_deals.get_deal_by_name("Small Double Deal")
+    big = double_deals.get_deal_by_name("Big Double Deal")
+    print("\nAvailable deals:")
+    print("Small double deals include: " +
+          ", ".join(small.get("possible_items", [])))
+
+    print("Big double deals include: " +
+          ", ".join(big.get("possible_items", [])))
+
+    deal_type = input(
+        "Which double deal do you want? Small or Big?\n").strip().lower()
+    if deal_type.startswith("s"):
+        deal = small
+    elif deal_type.startswith("b"):
+        deal = big
+    else:
+        print("Unknown double deal\n")
+        return False
+
+    burger_chosen: list[str] = []
+    possible_items = deal.get("possible_items", [])
+
+    while len(burger_chosen) < 2:
+        id = len(burger_chosen)+1
+        choice = input(f"Choose burger{id} from the list:\n").strip()
+        if choice not in possible_items:
+            print("This burger not in deal list, try again")
+            continue
+        burger_chosen.append(choice)
+
+    for b_name in burger_chosen:
+        order.add_raw_item(b_name)
+        order.user_order[-1]["double_deal"] = True
+
+    print(
+        f"Double deal created: {burger_chosen[0]} and {burger_chosen[1]} with 20% discount\n")
+    return True
