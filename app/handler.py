@@ -21,7 +21,7 @@ def handler_meal_fries(meal_name: str) -> str:
         return "French Fries"
 
     if input_type_of_fries in fries_options:
-        print(f"You ordered {meal_name} with {input_type_of_fries}\n")
+        # print(f"You ordered {meal_name} with {input_type_of_fries}\n")
         return input_type_of_fries
 
     print(f"We don't have '{input_type_of_fries}'. I add French Fries\n")
@@ -36,10 +36,12 @@ def handler_meal_drinks(meal_name: str) -> None | str:
     while True:
         input_type_of_drinks = input(
             f"What kind of drinks do you want?\nOptions: {', '.join(drinks_options)}\n"
-        )
+        ).strip()
 
+        for opt in drinks_options:
+            if input_type_of_drinks.lower() == opt.lower():
+                return opt
         if input_type_of_drinks in drinks_options:
-            print(f"You ordered {meal_name} with {input_type_of_drinks}")
             return input_type_of_drinks
 
         print(
@@ -86,7 +88,6 @@ def handler_item_size(item_name: str) -> None | str:
                 return size_options[0]
 
         if input_size in size_options:
-            print(f"Ok, {item_name} {input_size}\n")
             return input_size
 
         print("Wrong size, choose from the list\n")
@@ -188,7 +189,7 @@ def handler_double_deal(burger_name: str, double_deals: DoubleDeals, order: Orde
     for item in possible_items:
         print(f"- {item}")
     raw = input(
-        "Do you want to create a Double Deal and get 20% discount on 2 burgers?\n").strip().lower()
+        "Do you want to create a Double Deal and get 20% discount on 2 burgers? (yes/no)\n").strip().lower()
     if raw not in ("yes", "ye", "y"):
         return False
 
@@ -203,8 +204,8 @@ def handler_double_deal(burger_name: str, double_deals: DoubleDeals, order: Orde
     for b_name in burgers_chosen:
         order.add_raw_item(b_name)
         order.user_order[-1]["double_deal"] = True
-        print(
-            f"Double Deal added:{burgers_chosen[0]} and {burgers_chosen[1]} with 20% discont\n")
+    print(
+        f"Double Deal added:{burgers_chosen[0]} and {burgers_chosen[1]} with 20% discont\n")
     return True
 
 

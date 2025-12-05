@@ -108,6 +108,19 @@ class Menu:
                 return float(ing.get("price", 0.0))
         return 0.0
 
+    def get_item_catrgory_for_llm_validation(self, name: str) -> str | None:
+        name_lower = name.strip().lower()
+        for combo in self.data.get("combos", []):
+            combo_name = combo.get("name", "").strip().lower()
+            if combo_name == name_lower:
+                return combo.get("category")
+
+        for item in self.data.get("items", []):
+            item_name = item.get("name", "").strip().lower()
+            if item_name == name_lower:
+                return item.get("category")
+        return None
+
 
 class MenuUpsell:
     def __init__(self, file_path: str) -> None:
@@ -161,3 +174,27 @@ class MenuUpsell:
                 options = sauces_options.get("options", [])
                 return options
         return []
+
+
+class VirtualMenu:
+    def __init__(self, file_path: str) -> None:
+        self.data = self.load_menu(file_path)
+
+    def load_menu(self, file_path: str) -> dict:
+        with open(file_path, "r") as file:
+            data = yaml.safe_load(file)
+        return data
+
+    def get_virtual_item(self, name) -> dict | None:
+        name_lower = name.strip().lower()
+        for item in self.data.get("items", []):
+            item_name = item.get("name", "").strip().lower()
+            if item_name == name_lower and item.get("virtual", False):
+                return item
+        return None
+
+    def get_possible_items(self, name: str) -> list:
+        item = self.get_virtual_item(name)
+        if not item:
+            return []
+        return item.get("possible_items", [])
