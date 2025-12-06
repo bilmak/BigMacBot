@@ -41,7 +41,7 @@ but your response must still be a ready JSON with two burgers.
 If the user message is EXACTLY one word and it is a general category
 (“burger”, “drink”, “combo”, “dessert”, “ice cream”, in any language),
 and the user does NOT mention any specific menu item name, then:
-- DO NOT guess a specific item,
+- DO NOT guess a specific item but ,
 - return a single object with only a "name" field equal to that word
   ("burger", "drink", etc.), without size/drink/fries fields.
 
@@ -81,7 +81,12 @@ ADDITIONAL RULES (VERY IMPORTANT):
 7. Never output any natural-language responses, questions, or explanations.
    Output JSON ONLY. All user-facing messages, greetings, clarifications,
    and follow-up questions are handled by the application, not by you.
+
+below our menu in yaml format:
+
 """
+with open("data/menu_ingredients.yaml", "r") as f:
+    SYSTEM_PROMPT += f.read()
 
 
 def chat_with_gpt(user_text: str) -> list[dict]:

@@ -8,7 +8,11 @@ def process_item(user_input: str,
                  order: orders.Order,
                  data_menu: Menu,
                  upsells: upsell.Upseller,
-                 double_deals: DoubleDeals):
+                 double_deals: DoubleDeals,
+                 size: str | None = None,
+                 fries: str | None = None,
+                 drink: str | None = None,
+                 is_double_deal: bool = False):
 
     if not data_menu.is_item_in_menu(user_input):
         print(
@@ -16,16 +20,27 @@ def process_item(user_input: str,
         return
 
     if "meal" in user_input.lower():
+        if not fries:
+            fries = handler.handler_meal_fries(user_input)
+        if not drink:
+            drink = handler.handler_meal_drinks(user_input)
         order.add_meal(
             user_input,
-            handler.handler_meal_fries(user_input),
-            handler.handler_meal_drinks(user_input),
+            fries, drink
         )
         sauce = handler.handler_sauce(user_input)
         if sauce:
             order.add_raw_item(sauce)
+        return
     else:
         if data_menu.is_burger(user_input):
+            if is_double_deal:
+                if not size:
+                    size = handler.handler_item_size(user_input)
+                order.add_raw_item(user_input, size)
+                order.user_order[-1]["double_deal"] = True
+                print(f"You added {user_input} as part of double deal")
+                return
             if handler.handler_double_deal(user_input, double_deals, order):
                 return
 
@@ -38,7 +53,8 @@ def process_item(user_input: str,
                 order.user_order.append(burger_data)
                 print("You customized your burger")
             else:
-                size = handler.handler_item_size(user_input)
+                if not size:
+                    size = handler.handler_item_size(user_input)
                 order.add_raw_item(user_input, size)
                 if size:
                     print(f"You added {size} {user_input}")
@@ -46,7 +62,9 @@ def process_item(user_input: str,
 
                     print(f"You added {user_input}")
         else:
-            size = handler.handler_item_size(user_input)
+            if not size:
+
+                size = handler.handler_item_size(user_input)
             order.add_raw_item(user_input, size)
             if size:
                 print(f"You added {size} {user_input}")
@@ -68,15 +86,15 @@ def validate_llm_items(items_from_llm: list[dict], data_menu: Menu) -> tuple[boo
             print(f"We don't have {name} in menu")
             return False, []
 
-        # sizes = data_menu.get_item_sizes(name)
-        # if sizes:
-        #     if "meal" not in name.lower():
-        #         size = raw_item.get("size")
-        #         if not size or size.lower() not in [s.lower() for s in sizes]:
-        #             print(
-        #                 f"For {name} you need to choose a size: {', '.join(sizes)}"
-        #             )
-        #             return False, []
+        sizes = data_menu.get_item_sizes(name)
+        if sizes and "meal" not in name.lower():
+            size = raw_item.get("size")
+            if size and size.lower() not in [s.lower() for s in sizes]:
+                print(
+                    f"Size '{size}' is not valid for {name}. Valid sizes: {', '.join(sizes)}"
+                )
+                return False, []
+
         if "meal" in name.lower():
             fries_options = data_menu.get_combo_slot_fries(name)
             drink_options = data_menu.get_combo_slot_drinks(name)
@@ -131,6 +149,46 @@ def process_text(user_input: str,
         handler.handler_deals_keyword(double_deals, order)
         return
     items = llm.chat_with_gpt(user_input)
+    virtual_words = {"burger", "drink", "combo", "dessert", "ice cream"}
+
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        name_llm = (it.get("name") or "").strip().lower()
+        if name_llm in virtual_words:
+            virtual_item = virtual_menu.get_possible_items(name_llm)
+            possible = virtual_menu.get_possible_items(name_llm)
+            if possible:
+                print(f"Which {name_llm} exactly would you like?")
+                print(" ,".join(possible))
+                choice = input(">").strip()
+                found = None
+                for opt in possible:
+                    if choice.lower() == opt.lower():
+                        found = opt
+                        break
+                if not found:
+                    print(
+                        "I couldn't find that item. Please type the exact name from the list.")
+                    return
+                process_item(found, order, data_menu, upsells, double_deals)
+            else:
+                print(
+                    f"What exactly do you mean by '{name_llm}'? Please specify the item name from the menu."
+                )
+            return
+    burger_indexes: list[int] = []
+    for idx, it in enumerate(items):
+        if not isinstance(it, dict):
+            continue
+        n = it.get("name")
+        if n and data_menu.is_burger(n):
+            burger_indexes.append(idx)
+    if len(burger_indexes) >= 2:
+        i1, i2 = burger_indexes[0], burger_indexes[1]
+        items[i1]["double_deal"] = True
+        items[i2]["double_deal"] = True
+        print("We applyed 20% Double Deal discount.")
     ok, items = validate_llm_items(items, data_menu)
     if not ok:
         print(
@@ -144,8 +202,12 @@ def process_text(user_input: str,
         name = item.get("name")
         if not name:
             continue
-
-        process_item(name, order, data_menu, upsells, double_deals)
+        size = item.get("size")
+        fries = item.get("fries")
+        drink = item.get("drink")
+        is_double = bool(item.get("double_deal"))
+        process_item(name, order, data_menu, upsells,
+                     double_deals, size,  fries, drink, is_double)
 
 
 if __name__ == "__main__":
