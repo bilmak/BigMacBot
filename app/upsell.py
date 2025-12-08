@@ -30,7 +30,7 @@ class Upseller:
         if answer not in ("yes", "y", "ye"):
             return
         choice_dessert = input(
-            f"What kind of dessert do you want to have?\nOptions: {','.join(desserts)}\n").strip()
+            f"What kind of dessert do you want to have?\nOptions: {', '.join(desserts)}\n").strip()
         if choice_dessert not in desserts:
             print("We dont have this dessert")
         else:

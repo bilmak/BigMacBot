@@ -125,7 +125,7 @@ def process_text(user_input: str,
 
         if possible:
             print(f"Which {name} exactly would you like?")
-            print(", ".join(possible))
+            print("\n".join(possible))
             choice = input(">").strip()
             found = None
             for opt in possible:
@@ -146,37 +146,51 @@ def process_text(user_input: str,
     if text in ("deal", "double", "deals", "double deal"):
         handler.handler_deals_keyword(double_deals, order)
         return
+
     items = llm.chat_with_gpt(user_input)
     virtual_words = {"burger", "drink", "combo", "dessert", "ice cream"}
+    concrete_items: list[dict] = []
+    virtual_names_in_order: list[str] = []
 
     for it in items:
         if not isinstance(it, dict):
             continue
-        name_llm = (it.get("name") or "").strip().lower()
-        if name_llm in virtual_words:
-            virtual_item = virtual_menu.get_possible_items(name_llm)
-            possible = virtual_menu.get_possible_items(name_llm)
-            if possible:
-                print(f"Which {name_llm} exactly would you like?")
-                print(" ,".join(possible))
-                choice = input(">").strip()
-                found = None
-                for opt in possible:
-                    if choice.lower() == opt.lower():
-                        found = opt
-                        break
-                if not found:
-                    print(
-                        "I couldn't find that item. Please type the exact name from the list.")
-                    return
-                process_item(found, order, data_menu, upsells, double_deals)
-            else:
+        name_llm_raw = it.get("name")
+        if not name_llm_raw:
+            continue
+
+        name_llm = name_llm_raw.strip().lower()
+
+        if name_llm.lower() in virtual_words:
+            virtual_names_in_order.append(name_llm.lower())
+        else:
+            concrete_items.append(it)
+
+    for vname in virtual_names_in_order:
+        possible = virtual_menu.get_possible_items(vname)
+        if possible:
+            print(f"Which {vname} exactly would you like?")
+            print("\n".join(possible))
+            choice = input(">").strip()
+            found = None
+            for opt in possible:
+                if choice.lower() == opt.lower():
+                    found = opt
+                    break
+            if not found:
                 print(
-                    f"What exactly do you mean by '{name_llm}'? Please specify the item name from the menu."
-                )
+                    "I couldn't find that item. Please type the exact name from the list.")
+                continue
+            process_item(found, order, data_menu, upsells, double_deals)
+        else:
+            print(
+                f"What exactly do you mean by '{vname}'? Please specify the item name from the menu.")
             return
+    if not concrete_items:
+        return
+
     burger_indexes: list[int] = []
-    for idx, it in enumerate(items):
+    for idx, it in enumerate(concrete_items):
         if not isinstance(it, dict):
             continue
         n = it.get("name")
@@ -184,17 +198,17 @@ def process_text(user_input: str,
             burger_indexes.append(idx)
     if len(burger_indexes) >= 2:
         i1, i2 = burger_indexes[0], burger_indexes[1]
-        items[i1]["double_deal"] = True
-        items[i2]["double_deal"] = True
+        concrete_items[i1]["double_deal"] = True
+        concrete_items[i2]["double_deal"] = True
         print("We applyed 20% Double Deal discount.")
-    ok, items = validate_llm_items(items, data_menu)
+    ok, concrete_items = validate_llm_items(concrete_items, data_menu)
     if not ok:
         print(
             "I couldn't understand your order. "
             "Could you specify it again with exact items and sizes?"
         )
         return
-    for item in items:
+    for item in concrete_items:
         if not isinstance(item, dict):
             continue
         name = item.get("name")
