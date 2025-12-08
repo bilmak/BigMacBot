@@ -35,8 +35,6 @@ def process_item(user_input: str,
     else:
         if data_menu.is_burger(user_input):
             if is_double_deal:
-                if not size:
-                    size = handler.handler_item_size(user_input)
                 order.add_raw_item(user_input, size)
                 order.user_order[-1]["double_deal"] = True
                 print(f"You added {user_input} as part of double deal")

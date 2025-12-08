@@ -82,11 +82,7 @@ ADDITIONAL RULES (VERY IMPORTANT):
    Output JSON ONLY. All user-facing messages, greetings, clarifications,
    and follow-up questions are handled by the application, not by you.
 
-below our menu in yaml format:
-
 """
-with open("data/menu_ingredients.yaml", "r") as f:
-    SYSTEM_PROMPT += f.read()
 
 
 def chat_with_gpt(user_text: str) -> list[dict]:
