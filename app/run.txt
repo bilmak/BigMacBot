@@ -1,0 +1,41 @@
+1. i want big mac and small fries and large coca-cola +
+{"name": "Big Mac"}
+{"name": "French Fries", "size": "small"}
+{"name": "Coca-Cola", "size": "large"}
+
+2. i want big mac meal with potato dips and fanta
+{"name": "Big Mac Meal", "fries": "Potato Dips", "drink": "Fanta"}
+
+3.big mac and cheeseburger on double deal
+{"name": "Big Mac", "double_deal": true}
+{"name": "Cheeseburger", "double_deal": true}
+
+
+4. i want double cheeseburger, big tasty, fries, milk and dessert
+{"name": "Vanilla Cone"}
+{"name": "Double Cheeseburger", "double_deal": true}
+{"name": "Big Tasty", "double_deal": true}
+{"name": "French Fries", "size": "small"}
+{"name": "Milk"}
+
+5. i want burger, drink, fries, double deal and big mac meal
+{"name": "Tea", "size": "large"}
+{"name": "Potato Dips", "size": "small"}
+{"name": "Big Mac", "double_deal": true}
+{"name": "Big Mac Meal", "fries": "French Fries", "drink": "Coca-Cola"}
+
+6.burger drink fries dessert
+{"name": "Big Tasty"}
+{"name": "Fanta", "size": "small"}
+{"name": "Potato Dips", "size": "medium"}
+{"name": "Apple Pie"}
+
+7. BIG MAC MEAL WITH FRENCH FRIES AND LARGE FANTA
+{"name": "Big Mac Meal", "fries": "French Fries", "drink": "Fanta"}
+
+8. big tasty, royal cheeseburger, fries, large sprite, apple pie, double deal
+{"name": "Big Tasty", "double_deal": true}
+{"name": "Royal Cheeseburger", "double_deal": true}
+{"name": "French Fries", "size": "small"}
+{"name": "Sprite", "size": "large"}
+{"name": "Apple Pie"}

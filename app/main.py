@@ -100,10 +100,10 @@ def validate_llm_items(items_from_llm: list[dict], data_menu: Menu) -> tuple[boo
             fries = raw_item.get("fries")
             drink = raw_item.get("drink")
 
-            if fries and fries not in fries_options:
+            if fries and fries.lower() not in [f.lower() for f in fries_options]:
                 print(f"We don't have {fries} as fries options for {name}")
                 return False, []
-            if drink and drink not in drink_options:
+            if drink and drink.lower() not in [d.lower() for d in drink_options]:
                 print(f"We don't have {drink} as drink options for {name}")
                 return False, []
         cleaned.append(raw_item)
@@ -129,7 +129,9 @@ def process_text(user_input: str,
             choice = input(">").strip()
             found = None
             for opt in possible:
-                if choice.lower() == opt.lower():
+                opt_norm = opt.strip().lower()
+                choice_norm = choice.strip().lower()
+                if choice_norm == opt_norm or opt_norm in choice_norm:
                     found = opt
                     break
             if not found:
@@ -143,12 +145,30 @@ def process_text(user_input: str,
                 f"What exactly do you mean by '{name}'? Please specify the item name from the menu.")
         return
 
-    if text in ("deal", "double", "deals", "double deal"):
-        handler.handler_deals_keyword(double_deals, order)
+    if (
+            ("double" in text or "deal" in text) and not any(
+                data_menu.is_burger(name) and name.lower() in text
+                for name in data_menu.menu_names()
+            )):
+
+        burgers = virtual_menu.get_possible_items("burger")
+        print("Choice first burger for double deals:")
+        print("\n".join(burgers))
+        first = input(">").strip()
+
+        print("Choice second burger for double deals:")
+        print("\n".join(burgers))
+        second = input(">").strip()
+        process_item(first, order, data_menu, upsells,
+                     double_deals, is_double_deal=True)
+        process_item(second, order, data_menu, upsells,
+                     double_deals, is_double_deal=True)
+        print("Double deal is applied")
         return
 
     items = llm.chat_with_gpt(user_input)
-    virtual_words = {"burger", "drink", "combo", "dessert", "ice cream"}
+    virtual_words = {"burger", "drink",
+                     "fries", "combo", "dessert", "ice cream"}
     concrete_items: list[dict] = []
     virtual_names_in_order: list[str] = []
 
@@ -174,7 +194,9 @@ def process_text(user_input: str,
             choice = input(">").strip()
             found = None
             for opt in possible:
-                if choice.lower() == opt.lower():
+                opt_norm = opt.strip().lower()
+                choice_norm = choice.strip().lower()
+                if choice_norm == opt_norm or opt_norm in choice_norm:
                     found = opt
                     break
             if not found:
@@ -254,7 +276,7 @@ if __name__ == "__main__":
             print("Double Deal: 20 % discount applied to two burgers!")
         total = calcul.calculate_total(order.user_order)
 
-        print(f"Total: {total:.2f}")
-        print("You ordered:\n")
+        print(f"TOTAL: {total:.2f}")
+        print("You ordered:")
         for item in order.user_order:
             print(" -", json.dumps(item))

@@ -8,6 +8,11 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 SYSTEM_PROMPT = """
 You are an assistant that converts McDonald's orders into JSON.
+IMPORTANT NAMING RULES:
+- For fries you must use EXACTLY these names:
+  * "French Fries"
+  * "Potato Dips"
+- Never use the name "Potato Dippers" or any other variation.
 
 Output ONLY JSON (no explanations, no text), formatted as a list of objects.
 Each object may contain the following fields:

@@ -20,9 +20,11 @@ def handler_meal_fries(meal_name: str) -> str:
         print("Ok, I add French Fries\n")
         return "French Fries"
 
-    if input_type_of_fries in fries_options:
-        # print(f"You ordered {meal_name} with {input_type_of_fries}\n")
-        return input_type_of_fries
+    normalized = {opt.lower(): opt for opt in fries_options}
+    key = input_type_of_fries.lower()
+    
+    if key in normalized:
+        return normalized[key]
 
     print(f"We don't have '{input_type_of_fries}'. I add French Fries\n")
     return "French Fries"
