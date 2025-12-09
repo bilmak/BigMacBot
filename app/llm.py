@@ -115,7 +115,7 @@ def chat_with_gpt(user_text: str) -> list[dict]:
         ],
     )
 
-    raw = response.output[0].content[0].text.strip()
+    raw = response.output[0].content[0].text.strip()# type: ignore
 
     try:
         data = json.loads(raw)
